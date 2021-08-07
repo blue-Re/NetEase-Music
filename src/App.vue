@@ -1,7 +1,15 @@
 <template>
   <router-view/>
+  <PlayController/>
 </template>
-
+<script>
+import PlayController from './components/PlayController.vue'
+export default {
+  components:{
+    PlayController
+  }
+}
+</script>
 <style lang="less">
 *{
   margin: 0;
@@ -12,5 +20,9 @@
 .icon{
   width: 0.30rem;
   height: 0.3rem;
+}
+a{
+  color: #333;
+  text-decoration: none;
 }
 </style>

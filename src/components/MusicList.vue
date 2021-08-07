@@ -7,7 +7,12 @@
     <div class="mlist">
       <div class="swiper-container" id="musicSwiper">
         <div class="swiper-wrapper">
-          <div class="swiper-slide" v-for="(item, i) in musicList" :key="i">
+          <router-link
+            :to="{ path: '/listView', query: { id: item.id } }"
+            class="swiper-slide"
+            v-for="(item, i) in state.musicList"
+            :key="i"
+          >
             <img :src="item.picUrl" :alt="item.name" />
             <div class="name">{{ item.name }}</div>
             <div class="count">
@@ -16,7 +21,7 @@
               </svg>
               <span>{{ changeValue(item.playCount) }}</span>
             </div>
-          </div>
+          </router-link>
         </div>
       </div>
     </div>
@@ -27,8 +32,44 @@
 import "swiper/css/swiper.css";
 import Swiper from "swiper";
 import { getMusicList } from "@/api/index.js";
+import { reactive, onMounted, onUpdated } from "vue";
 
+// Vue3的写法
 export default {
+  setup() {
+    let state = reactive({
+      musicList: [],
+    });
+    function changeValue(num) {
+      let res = 0;
+      if (num >= 100000000) {
+        res = num / 100000000;
+        res = res.toFixed(2) + "亿";
+      } else if (num > 10000) {
+        res = num / 10000;
+        res = res.toFixed(2) + "万";
+      }
+      return res;
+    }
+    onMounted(async () => {
+      let result = await getMusicList();
+      state.musicList = result.data.result;
+    });
+    onUpdated(() => {
+      new Swiper("#musicSwiper", {
+        slidesPerView: 3,
+        spaceBetween: 10,
+      });
+    });
+    return {
+      state,
+      changeValue,
+    };
+  },
+};
+
+// Vue2的写法
+/* export default {
   data() {
     return {
       musicList: [],
@@ -57,7 +98,7 @@ export default {
       spaceBetween: 10,
     });
   },
-};
+}; */
 </script>
 
 <style lang="less" scoped>
