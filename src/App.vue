@@ -5,6 +5,10 @@
 <script>
 import PlayController from './components/PlayController.vue'
 export default {
+  mounted(){
+    let userData = JSON.parse(localStorage.userData)
+    this.$store.commit('setUser',userData)
+  },
   components:{
     PlayController
   }

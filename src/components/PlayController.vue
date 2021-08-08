@@ -36,6 +36,12 @@
 import { mapState } from "vuex";
 import PlayMusic from "@/components/PlayMusic";
 export default {
+  mounted() {
+    this.$store.dispatch("reqLyric", { id: this.playlist[this.playCurrentIndex].id });
+  },
+  updated(){
+    this.$store.dispatch("reqLyric", { id: this.playlist[this.playCurrentIndex].id });
+  },
   data() {
     return {
       paused: true,
@@ -46,17 +52,25 @@ export default {
     PlayMusic,
   },
   computed: {
-    ...mapState(["playlist", "playCurrentIndex"]),
+    ...mapState(["playlist", "playCurrentIndex", "lyric"]),
   },
   methods: {
     play() {
       if (this.$refs.audio.paused) {
         this.$refs.audio.play();
         this.paused = false;
+        this.UpdateTime()
       } else {
         this.$refs.audio.pause();
         this.paused = true;
+        clearInterval(this.$store.state.id)
       }
+    },
+    // 异步更新当前时间
+    UpdateTime() {
+      this.$store.state.id = setInterval(() => {
+        this.$store.commit("setCurrentTime", this.$refs.audio.currentTime);
+      }, 1000);
     },
   },
 };

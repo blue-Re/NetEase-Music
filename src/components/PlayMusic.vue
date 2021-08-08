@@ -18,18 +18,28 @@
         </svg>
       </div>
     </div>
-    <div class="playContent">
-      <img src="../assets/img/needle-ip6.png" :class="{active:!paused}" alt="" class="needle" />
+    <div class="playContent" v-show="!isLyric">
+      <img
+        src="../assets/img/needle-ip6.png"
+        :class="{ active: !paused }"
+        alt=""
+        class="needle"
+      />
       <img src="../assets/img/disc-ip6.png" alt="" class="disc" />
       <img :src="playDetail.al.picUrl" alt="" />
     </div>
-    <div class="playLyric"></div>
+    <div class="playLyric" v-show="isLyric" ref="playLyric">
+      <p :class="{active:(currentTime*1000>=item.pre&&currentTime*1000<item.time)}"
+      v-for="(item, index) in $store.getters.lyricList" :key="index">
+        {{ item.lyric }}
+      </p>
+    </div>
     <div class="progress"></div>
     <div class="playFooter">
       <svg class="icon" aria-hidden="true">
         <use xlink:href="#icon-xunhuan"></use>
       </svg>
-      <svg class="icon" aria-hidden="true">
+      <svg class="icon" aria-hidden="true" @click="goPlay(-1)">
         <use xlink:href="#icon-shangyishou"></use>
       </svg>
       <svg v-if="paused" @click="play" class="icon play" aria-hidden="true">
@@ -38,7 +48,7 @@
       <svg v-else class="icon" aria-hidden="true" @click="play">
         <use xlink:href="#icon-zantingtingzhi"></use>
       </svg>
-      <svg class="icon" aria-hidden="true">
+      <svg class="icon" aria-hidden="true" @click="goPlay(1)">
         <use xlink:href="#icon-xiayishou"></use>
       </svg>
       <svg class="icon" aria-hidden="true">
@@ -49,8 +59,35 @@
 </template>
 
 <script>
+import { mapState } from "vuex";
 export default {
   props: ["playDetail", "paused", "play"],
+  data() {
+    return {
+      isLyric: true,
+    };
+  },
+  computed: {
+    ...mapState(["lyric", "currentTime",'playlist','playCurrentIndex']),
+  },
+  watch:{
+    currentTime(newValue){
+      let p = document.querySelector('p.active')
+      let offsetTop = p.offsetTop
+      this.$refs.playLyric.scrollTop = p.offsetTop
+    }
+  },
+  methods:{
+    goPlay(num){
+      let index = this.playCurrentIndex+num
+      if (index<0) {
+        index = this.playlist.length-1
+      }else if(index==this.playlist.length){
+        index=0
+      }
+      this.$store.commit('setPlayIndex',index)
+    }
+  }
 };
 </script>
 
